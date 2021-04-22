@@ -1,10 +1,21 @@
+# metaclass to allow the <KTypes> class to handle unknown attributes, set new 
+# types by simple assignment, and record/name user defined types
+#
+# named types are immutable; after binding a type to a <KTypes> attribute, that
+# type can no longer be modified
 class MetaType(type):
+    # set a <KType> attribute to refer to a type; disallow mutability for 
+    # previously bound attribute
     def __setattr__(self, name, value):
         if not name in self.universe:
             if isinstance(value, dict):
                 value = KTypes.kmeta(name, value)
             self._add_type_to_universe(name, value)
+            return
 
+        raise Exception("named type is already defined")
+
+    # return type by name
     def __getattr__(self, name):
         for kname, ktype in self.universe.items():
             if kname == name:
@@ -12,11 +23,25 @@ class MetaType(type):
         return None
 
 # TODO: make token instances unique
+# wrapper class for the KTypes module; used to allow for custom attribute
+# handling when defining new named types
 class KTypes(metaclass=MetaType):
+    # add [ktype] to the universe with [name] and [hash] defining the dict key
     def _add_type_to_universe(name, ktype, hash=""):
         KTypes.universe[name+str(hash)] = ktype
 
+    # abstract class which is inherited by all types of the known type system. 
+    # types are represented as instances of classes inheriting from <KType>
     class KType():
+        # instance attributes:
+        # [self.predicate] boolean function which must be satisfied by all
+        #       tokens of the type
+        # [self.predicate_hash] hash value of the predicate function used to
+        #       test for type equality between predicate types
+        # [self.has_predicate] <True> if a predicate function is supplied
+
+        # initialize a type, possibly with a boolean [predicate] function which
+        # must be satisfied by tokens of the type
         def __init__(self, predicate=None):
             self.predicate = predicate
             self.predicate_hash = hash(predicate)
@@ -25,21 +50,29 @@ class KTypes(metaclass=MetaType):
                 self.predicate = self._default_predicate
                 self.has_predicate = False
 
+        # constructs a token of this type. 
         def __call__(self, *args, **kwargs):
             return self.construct(*args, **kwargs)
 
+        # inbuilt predicate enforcing the raw string representation of the type 
+        # has a length equal to [size]
         def _where_size_eq(self, size):
             def f(raw_data):
                 return len(raw_data) == size
 
             return f
 
+        # inbuild predicate enforcing the raw string representation of the type
+        # ends whenever the [end] character is reached
         def _where_ends_on(self, end):
             def f(raw_data):
                 return end not in raw_data
             
             return f
 
+        # generates a function to handle matching multiple predicates, where 
+        # a token is only valid if all predicates are satisfied. will operate
+        # via short-circuit computation
         def _multiple_predicate(self, preds):
             def f(raw_data):
                 for pred in preds:
@@ -49,6 +82,9 @@ class KTypes(metaclass=MetaType):
 
             return f
 
+        # generate a new type resulting from applying a [predicate], a fixed size
+        # equal to [size_eq], and/or termination on [ends_on] to an existing
+        # type. will return existing predicate type if found.
         def where(self, predicate=None, size_eq=None, ends_on=None):
             if predicate is None and size_eq is None and ends_on is None:
                 raise Exception("predicate required")
@@ -81,15 +117,21 @@ class KTypes(metaclass=MetaType):
              
             return pred_ktype
 
+        # contruct a token of type <self>
         def construct(self, raw_data):
-            return raw_data
-
+            pass
+        
+        # default predicate accepts all tokens
         def _default_predicate(self, arg):
             return True
 
+        # string used to designate the presence of a predicate in the __str__ 
+        # method, for printing purposes only.
         def _predicate_designation(self):
-            return " (predicate)" if self.has_predicate else ""
+            return "*" if self.has_predicate else ""
 
+        # override to alias the '|' operator to construct an or-type between 
+        # types [a] and [b]
         def __or__(a, b):
             existing_kor = KTypes._get_kor_in_universe(a, b)
             if existing_kor is None:
@@ -98,24 +140,42 @@ class KTypes(metaclass=MetaType):
             KTypes._add_type_to_universe("or", existing_kor, hash=hash(existing_kor))
             return existing_kor
 
+        # returns a string representation of the type <self> 
         def __str__(self):
             return self.name + self._predicate_designation()
 
+    # class used to represent tokens of a given type. contains a value of some 
+    # data and a reference to the type of that value.
+    #
+    # value can either be:
+    #   <dict> to indicate <kmeta> types
+    #   <_function_wrapper> to indicate <kfunc> types
+    #   <tuple> to indicate <kor> types 
     class Token():
-        # value can be dict (kmeta), _function_wrapper (kfunc), or tuple (kor)
+        # instance attributes:
+        # [self.value] the value of the data referenced by this token
+        # [self.type] the known type of the data
+        # [self._is_meta] true if this token encodes a <kmeta> type
+        # [self._is_func] true if this token encodes a <kfunc> type
+        # [self._is_or] true if this token encodes a <kor> type
+
+        # construct a token with [value] for a given [ktype] 
         def __init__(self, value, ktype):
             self.value = value
             self.type = ktype
             self._is_meta = True if isinstance(value, dict) else False
             self._is_func = True if isinstance(value, KTypes._function_wrapper) else False
             self._is_or = True if isinstance(value, tuple) else False
-            
+
+        # allow tokens which encode <kfunc> types to be callable. defers to the
+        # stored function.
         def __call__(self, *args, **kwargs):
             if self._is_func:
                 return self.value(*args, **kwargs)
             else:
                 raise Exception("token is not callable")
 
+        # test for equality of tokens
         def __eq__(self, o):
             if not isinstance(o, KTypes.Token):
                 return False
@@ -127,7 +187,8 @@ class KTypes(metaclass=MetaType):
                 return self.value == o.value
             else:
                 return self.value == o.value
-            
+        
+        # return a string representation of the token
         def __str__(self):
             if self._is_meta:
                 return '[' + ", ".join(list(map(lambda x: str(x), self.value.values()))) + '] : ' + str(self.type)
@@ -142,11 +203,14 @@ class KTypes(metaclass=MetaType):
             else:
                 return str(self.value) + " : " + str(self.type)
 
+        # true if <self> is a token of [ktype]
         def is_a(self, ktype):
             if isinstance(ktype, KTypes.kor):
                 return self.is_a(ktype.left) or self.is_a(ktype.right)
             return self.type == ktype
 
+        # allow tokens which encode <kmeta> types to have attributes. defer to
+        # the <kmeta> underlying dict for attribute values.
         def __getattr__(self, name):
             if self._is_meta:
                 attr = self.value.get(name, None)
@@ -155,9 +219,11 @@ class KTypes(metaclass=MetaType):
                 return attr
             return getattr(self.value, name)
 
+        # TODO: implement
         def __or__(a, b):
             pass
-
+    
+    # represents a function/curried-function for multiple arguments
     class kfunc(KType):
         # ktypes is a list of ktypes with the final ktype being the returned value
         def __init__(self, signature):
@@ -281,6 +347,21 @@ class KTypes(metaclass=MetaType):
                     raise Exception("type mismatch")
 
             return KTypes.Token(token_dict, self)
+
+    class knone(KType):
+        instances = {}
+
+        def __init__(self):
+            super().__init__()
+            self.name = "None"
+
+        def construct(self, raw_data):
+            raise Exception("cannot construct token of KType.None")
+        
+        def matches(self, raw_data):
+            raise Excpetion("cannot match token of KType.None")
+
+        
 
     class kint(KType):
         instances = {}
@@ -447,7 +528,7 @@ class KTypes(metaclass=MetaType):
 
             return self.stream_tokens
 
-    universe = {"int": kint(), "str": kstr()}
+    universe = {"int": kint(), "str": kstr(), "none": knone()}
 
     def _get_function_in_universe(signature):
         for name, ktype in KTypes.universe.items():

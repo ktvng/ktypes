@@ -8,6 +8,4 @@ setup(
     author='Kevin Tang',
     license='MIT',
     install_requires=[],
-    tests_require=[],
-    test_suite="tests"
 )
