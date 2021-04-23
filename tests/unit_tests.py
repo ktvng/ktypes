@@ -1,4 +1,4 @@
-from ktypes import KTypes as types
+from ktypes import types
 import random
 
 tests = []

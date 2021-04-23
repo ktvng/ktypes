@@ -15,7 +15,7 @@ from ktypes._metatype import MetaType
 # TODO: make token instances unique
 # wrapper class for the KTypes module; used to allow for custom attribute
 # handling when defining new named types
-class KTypes(metaclass=MetaType):
+class types(metaclass=MetaType):
     ############################################################################
     ############################################################################
     ############################################################################
@@ -26,12 +26,12 @@ class KTypes(metaclass=MetaType):
             
 
     def function(func):
-        return _function_wrapper.wrap(KTypes.universe)(func)
+        return _function_wrapper.wrap(types.universe)(func)
 
     def ind_prod(func):
-        ktype = KTypes.universe.get_meta(func.ktype.signature)
+        ktype = types.universe.get_meta(func.ktype.signature)
 
-        @KTypes.function
+        @types.function
         def klambda(x : ktype) -> func.ktype.signature[-1]:
             return func(*list(x.value.values()))
         
@@ -39,8 +39,8 @@ class KTypes(metaclass=MetaType):
 
     def product(dict_spec):
         name = " & ".join(map(str, dict_spec.values()))
-        ktype = kmeta(KTypes.universe, name, dict_spec)
-        KTypes.universe.add_type(name, ktype, hash=hash(tuple(dict_spec.values())))
+        ktype = kmeta(types.universe, name, dict_spec)
+        types.universe.add_type(name, ktype, hash=hash(tuple(dict_spec.values())))
         return ktype
 
 
