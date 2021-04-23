@@ -7,17 +7,17 @@ class MetaType(type):
     # set a <KType> attribute to refer to a type; disallow mutability for 
     # previously bound attribute
     def __setattr__(self, name, value):
-        if not name in self.universe:
+        if not name in self.universe.types:
             if isinstance(value, dict):
                 value = KTypes.kmeta(name, value)
-            self._add_type_to_universe(name, value)
+            self.universe.add_type(name, value)
             return
 
         raise Exception("named type is already defined")
 
     # return type by name
     def __getattr__(self, name):
-        for kname, ktype in self.universe.items():
+        for kname, ktype in self.universe.types.items():
             if kname == name:
                 return ktype
         return None
@@ -114,7 +114,7 @@ class KTypes(metaclass=MetaType):
             if pred_ktype is None:
                 pred_ktype = klass(predicate)
                 klass.instances[predicate_hash] = pred_ktype
-                KTypes._add_type_to_universe(str(self), pred_ktype, hash=predicate_hash)
+                KTypes.universe.add_type(str(self), pred_ktype, hash=predicate_hash)
              
             return pred_ktype
 
@@ -134,11 +134,11 @@ class KTypes(metaclass=MetaType):
         # override to alias the '|' operator to construct an or-type between 
         # types [a] and [b]
         def __or__(a, b):
-            existing_kor = KTypes._get_kor_in_universe(a, b)
+            existing_kor = KTypes.universe.get_or(a, b)
             if existing_kor is None:
                 existing_kor = KTypes.kor(a, b)
 
-            KTypes._add_type_to_universe("or", existing_kor, hash=hash(existing_kor))
+            KTypes.universe.add_type("or", existing_kor, hash=hash(existing_kor))
             return existing_kor
 
         # returns a string representation of the type <self> 
@@ -253,7 +253,6 @@ class KTypes(metaclass=MetaType):
                 return attr
             return getattr(self.value, name)
 
-        # TODO: implement
         def __or__(a, b):
             if a._is_func and b._is_func:
                 return a.value | b.value
@@ -268,20 +267,35 @@ class KTypes(metaclass=MetaType):
             self.args = args
             self.kwargs = kwargs
 
+        def _typecheck(self, arg, ktype):
+            if ktype is None:
+                raise Exception("missing type")
+
+            if isinstance(arg, KTypes.Token):
+                if not arg.is_a(ktype):
+                    raise Exception(f"type mismatch: got <{str(arg)}> but expected <{str(ktype)}>")
+            
+            return True
+
+        def _get_type_after_currying(self, old_ktype):
+            signature = old_ktype.signature[1:]
+            if len(signature) == 1:
+                return signature[0] 
+            else:
+                return KTypes.universe.get_function(signature)
+
         def _curry(self, arg):
             _, required_type = list(self.func.__annotations__.items())[len(self.args)]
-            KTypes._typecheck(arg, required_type)
-            curried_type = KTypes._get_type_after_currying(self.ktype)
+            self._typecheck(arg, required_type)
+            curried_type = self._get_type_after_currying(self.ktype)
             if isinstance(curried_type, KTypes.kfunc):
                 curried_func = KTypes._function_wrapper(self.func, curried_type, args=self.args+[arg], kwargs=self.kwargs)
                 return KTypes.Token(curried_func, curried_type)
             else:
                 result = self.func(*(self.args + [arg]), **self.kwargs)
-                KTypes._typecheck(result, self.func.__annotations__.get("return", None))
+                self._typecheck(result, self.func.__annotations__.get("return", None))
                 return result
 
-        # TODO: this is not updating self.ktype to the new ktype.
-        # TODO: this should also ensure that each curried arg is right
         def __call__(self, *args, **kwargs):
             curried_func = self
             if args or kwargs:
@@ -483,21 +497,62 @@ class KTypes(metaclass=MetaType):
 
 
     class kuniverse(KType):
-        def __init__(self, index):
+        def __init__(self, index, seed={}):
             super().__init__(None)
             self.index = index
-            self.name = f"universe {index}"
-            self.ktypes = []
+            self.name = f"Univ_{index}"
+            self.types = seed
 
         def where(self, predicate):
-            return
+            return self
 
         def matches(self, raw_data):
             return False
 
         def construct(self, raw_data):
-            return
+            return self
 
+        def add_type(self, name, ktype, hash=""):
+            self.types[name + str(hash)] = ktype
+
+        def get_function(self, signature):
+            for name, ktype in self.types.items():
+                if isinstance(ktype, KTypes.kfunc) and ktype.signature == signature:
+                    return ktype
+            func = KTypes.kfunc(signature)
+            self.add_type(func.name, func)
+
+            return func
+
+        def get_meta(self, signature):
+            for name, ktype in self.types.items():
+                if isinstance(ktype, KTypes.kmeta) and ktype.signature == signature[:-1]:
+                    return ktype
+            
+            # TODO: handle case where kmeta does not exist
+            return None            
+
+        def _add_type_to_dict(self, ktype, d):
+            if isinstance(ktype, KTypes.kor):
+                self._add_type_to_dict(ktype.left, d)
+                self._add_type_to_dict(ktype.right, d)
+            else:
+                d[ktype] = 1
+
+        def get_or(self, a, b):
+            or_dict = {}
+            self._add_type_to_dict(a, or_dict)
+            self._add_type_to_dict(b, or_dict)
+
+            for name, ktype in self.types.items():
+                if isinstance(ktype, KTypes.kor):
+                    candidate_or_dict = {}
+                    self._add_type_to_dict(ktype, candidate_or_dict)
+                    if candidate_or_dict == or_dict:
+                        return ktype
+
+            # TODO: handle case where kor does not exist
+            return None
 
 
 
@@ -509,68 +564,7 @@ class KTypes(metaclass=MetaType):
     ############################################################################
     # module global helper methods
 
-    universe = {"int": kint(), "str": kstr(), "none": knone()}
-
-    # add [ktype] to the universe with [name] and [hash] defining the dict key
-    def _add_type_to_universe(name, ktype, hash=""):
-        KTypes.universe[name+str(hash)] = ktype
-        
-
-    def _get_function_in_universe(signature):
-        for name, ktype in KTypes.universe.items():
-            if isinstance(ktype, KTypes.kfunc) and ktype.signature == signature:
-                return ktype
-        func = KTypes.kfunc(signature)
-        KTypes._add_type_to_universe(func.name, func)
-
-        return func
-
-    def _get_kmeta_in_universe(signature):
-        for name, ktype in KTypes.universe.items():
-            if isinstance(ktype, KTypes.kmeta) and ktype.signature == signature[:-1]:
-                return ktype
-        
-        # TODO: handle case where kmeta does not exist
-        return None
-
-    def _add_type_to_dict(ktype, d):
-        if isinstance(ktype, KTypes.kor):
-            KTypes._add_type_to_dict(ktype.left, d)
-            KTypes._add_type_to_dict(ktype.right, d)
-        else:
-            d[ktype] = 1
-
-    def _get_kor_in_universe(a, b):
-        or_dict = {}
-        KTypes._add_type_to_dict(a, or_dict)
-        KTypes._add_type_to_dict(b, or_dict)
-
-        for name, ktype in KTypes.universe.items():
-            if isinstance(ktype, KTypes.kor):
-                candidate_or_dict = {}
-                KTypes._add_type_to_dict(ktype, candidate_or_dict)
-                if candidate_or_dict == or_dict:
-                    return ktype
-
-        # TODO: handle case where kor does not exist
-        return None
-
-    def _typecheck(arg, ktype):
-        if ktype is None:
-            raise Exception("missing type")
-
-        if isinstance(arg, KTypes.Token):
-            if not arg.is_a(ktype):
-                raise Exception(f"type mismatch: got <{str(arg)}> but expected <{str(ktype)}>")
-        
-        return True
-
-    def _get_type_after_currying(old_ktype):
-        signature = old_ktype.signature[1:]
-        if len(signature) == 1:
-            return signature[0] 
-        else:
-            return KTypes._get_function_in_universe(signature)
+    universe = kuniverse(index=0, seed={"int": kint(), "str": kstr(), "none": knone()})
 
     ############################################################################
     ############################################################################
@@ -579,11 +573,11 @@ class KTypes(metaclass=MetaType):
 
     def function(func):
         signature = list(func.__annotations__.values())
-        function_type = KTypes._get_function_in_universe(signature)
+        function_type = KTypes.universe.get_function(signature)
         return KTypes.Token(KTypes._function_wrapper(func, function_type), function_type)
 
     def ind_prod(func):
-        ktype = KTypes._get_kmeta_in_universe(func.ktype.signature)
+        ktype = KTypes.universe.get_meta(func.ktype.signature)
 
         @KTypes.function
         def klambda(x : ktype) -> func.ktype.signature[-1]:
@@ -594,7 +588,7 @@ class KTypes(metaclass=MetaType):
     def product(dict_spec):
         name = " & ".join(map(str, dict_spec.values()))
         ktype = KTypes.kmeta(name, dict_spec)
-        KTypes._add_type_to_universe(name, ktype, hash=hash(tuple(dict_spec.values())))
+        KTypes.universe.add_type(name, ktype, hash=hash(tuple(dict_spec.values())))
         return ktype
 
 
