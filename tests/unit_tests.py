@@ -306,17 +306,3 @@ def coproduct_function():
 @unit_test
 def sandbox():
     "sandbox test"
-    @types.function
-    def f(a : types.int) -> types.str:
-        return types.str(a.value)
-    
-    @types.function
-    def g(b : types.str) -> types.str:
-        return b
-    
-    y = (f | g)
-    q = types.int | types.str
-    # m = q("45")
-    # print(m)
-    # z= y(m)
-    # print(z)
