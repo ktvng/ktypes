@@ -26,9 +26,10 @@ class MetaType(type):
 # wrapper class for the KTypes module; used to allow for custom attribute
 # handling when defining new named types
 class KTypes(metaclass=MetaType):
-    # add [ktype] to the universe with [name] and [hash] defining the dict key
-    def _add_type_to_universe(name, ktype, hash=""):
-        KTypes.universe[name+str(hash)] = ktype
+    ############################################################################
+    ############################################################################
+    ############################################################################
+    # meta-structural methods
 
     # abstract class which is inherited by all types of the known type system. 
     # types are represented as instances of classes inheriting from <KType>
@@ -181,32 +182,65 @@ class KTypes(metaclass=MetaType):
                 return False
             if o.type != self.type:
                 return False
+            return self.value == o.value
+
+        # return a string representation for a kmeta type with <dict> value
+        def _str_for_kmeta(self):
+            return '[' + ", ".join(list(map(lambda x: str(x), self.value.values()))) + ']'
+
+        # return a string representation for a kfunc type with <_function_wrapper> type
+        def _str_for_kfunc(self):
+            function_name = self.value.func.__name__
+            if self.value.args:
+                function_name = f"klambda<{function_name}>"
+            return function_name
+
+        # return a string representation for a kor type with <tuple> value
+        def _str_for_kor(self):
+            inj, token = self.value
+            return inj + "(" + str(token) + ")"
+
+        # return a string representation for a basic type
+        def _str_for_basic(self):
+            return str(self.value)
+
+        # default action to return None
+        def _no_action():
+            return None
+
+        # applys either [kmeta_action], [kfunc_action], or [kor_action] depending
+        # on the value type of this token
+        def _do_function_on_type(self, 
+                kmeta_action=_no_action, 
+                kfunc_action=_no_action, 
+                kor_action=_no_action, 
+                base_action=_no_action,
+                args=[]):
+
             if self._is_meta:
-                return self.value == o.value
+                return kmeta_action(*args)
             elif self._is_func:
-                return self.value == o.value
+                return kfunc_action(*args)
+            elif self._is_or:
+                return kor_action(*args)
             else:
-                return self.value == o.value
-        
+                return base_action(*args)
+
         # return a string representation of the token
         def __str__(self):
-            if self._is_meta:
-                return '[' + ", ".join(list(map(lambda x: str(x), self.value.values()))) + '] : ' + str(self.type)
-            elif self._is_func:
-                function_name = self.value.func.__name__
-                if self.value.args:
-                    function_name = f"lambda<{function_name}>"
-                return function_name + " : " + str(self.type)
-            elif self._is_or:
-                inj, token = self.value
-                return inj + "(" + str(token) + ") : " + str(self.type)
-            else:
-                return str(self.value) + " : " + str(self.type)
+            token_str = self._do_function_on_type(
+                kmeta_action=self._str_for_kmeta,
+                kfunc_action=self._str_for_kfunc, 
+                kor_action=self._str_for_kor,
+                base_action=self._str_for_basic)
+
+            return token_str + " : " + str(self.type)
 
         # true if <self> is a token of [ktype]
         def is_a(self, ktype):
-            if isinstance(ktype, KTypes.kor):
-                return self.is_a(ktype.left) or self.is_a(ktype.right)
+            if self._is_or:
+                inj, val = self.value
+                return val.is_a(ktype.left) or val.is_a(ktype.right)
             return self.type == ktype
 
         # allow tokens which encode <kmeta> types to have attributes. defer to
@@ -221,31 +255,10 @@ class KTypes(metaclass=MetaType):
 
         # TODO: implement
         def __or__(a, b):
-            pass
-    
-    # represents a function/curried-function for multiple arguments
-    class kfunc(KType):
-        # ktypes is a list of ktypes with the final ktype being the returned value
-        def __init__(self, signature):
-            super().__init__()
-            self.signature = signature
-            self.name = self._name()
+            if a._is_func and b._is_func:
+                return a.value | b.value
 
-        def _name(self):
-            ktype_names = list(map(lambda x: str(x), self.signature))
-            return " -> ".join(ktype_names)
-
-        def __or__(a, b):
-            pass
-
-        def where(self, predicate):
-            pass
-
-        def construct(self, raw_data):
-            return KTypes._function_wrapper(func)
-
-        def matches(self, raw_data):
-            return False
+            raise Exception("cannot or tokens of non-function types")
 
     class _function_wrapper():
         def __init__(self, func, ktype, args=[], kwargs={}):
@@ -278,24 +291,131 @@ class KTypes(metaclass=MetaType):
             return curried_func
 
         def __or__(a, b):
-            print("or")
+            if len(a.ktype.signature) != 2 or len(b.ktype.signature) != 2:
+                raise Exception("cannot 'or' curried-functions")
 
-    class kuniverse(KType):
-        def __init__(self, index):
-            super().__init__(None)
-            self.index = index
-            self.name = f"universe {index}"
-            self.ktypes = []
+            a_returns = a.ktype.signature[-1]
+            b_returns = b.ktype.signature[-1]
+
+            if a_returns != b_returns:
+                raise Exception("cannot 'or' functions with different return values")
+
+            a_domain_type = a.ktype.signature[0]
+            b_domain_type = b.ktype.signature[0]
+
+            if a_domain_type == b_domain_type:
+                raise Exception("cannot 'or' functions defined over the same domain")
+
+            @KTypes.function
+            def klambda(x : a_domain_type | b_domain_type) -> a_returns:
+                inj, token = x.value
+                if(token.is_a(a_domain_type)):
+                    return a(token)
+                else:
+                    return b(token)
+
+
+            return klambda
+
+            
+            
+
+
+
+
+    ############################################################################
+    ############################################################################
+    ############################################################################
+    # ktypes
+
+    # basic ktype for integer values
+    class kint(KType):
+        # class attributes:
+        # [instances] stores different instances of the <kint> type whcih may 
+        #       arise from predicate application. key is a unique hash code obtained
+        #       from the supplied predicate used to determine if two predicates
+        #       or predicate types are equal.
+        #
+        # instance attributes:
+        # [name] of the ktype
+
+        # see top level documentation
+        instances = {}
+
+        # create the type <kint>. only called initially to generate the global
+        # KTypes.int type, and when a [predicate] is applied
+        def __init__(self, predicate=None):
+            super().__init__(predicate)
+            self.name = "int"
+
+        # TODO: allow raw_data to be other formats than string
+        # construct an instance of <kint> from [raw_data]
+        def construct(self, raw_data):
+            return KTypes.Token(int(raw_data), self)
+
+        # returns True if [raw_data] type matches <self>
+        def matches(self, raw_data):
+            if " " in raw_data:
+                return False
+
+            try:
+                int(raw_data)
+                return self.predicate(raw_data)
+            except Exception:
+                return False
+
+    # basic ktype for string values
+    class kstr(KType):
+        # class attributes:
+        # [instances] stores different instances of the <kint> type whcih may 
+        #       arise from predicate application. key is a unique hash code obtained
+        #       from the supplied predicate used to determine if two predicates
+        #       or predicate types are equal.
+        #
+        # instance attributes:
+        # [name] of the ktype  
+
+        # see top level documentation
+        instances = {}
+
+        # create the type <kstr>. only called initially to generate the global
+        # KTypes.str type, and when a [predicate] is applied
+        def __init__(self, predicate=None):
+            super().__init__(predicate)
+            self.name = "str"
+
+        def matches(self, raw_data):
+            return self.predicate(raw_data)
+
+        def construct(self, raw_data):
+            return KTypes.Token(str(raw_data), self)
+
+
+
+
+
+    # represents a function/curried-function for multiple arguments
+    class kfunc(KType):
+        # ktypes is a list of ktypes with the final ktype being the returned value
+        def __init__(self, signature):
+            super().__init__()
+            self.signature = signature
+            self.name = self._name()
+
+        def _name(self):
+            ktype_names = list(map(lambda x: str(x), self.signature))
+            return " -> ".join(ktype_names)
 
         def where(self, predicate):
-            return
+            pass
+
+        def construct(self, raw_data):
+            return KTypes._function_wrapper(func)
 
         def matches(self, raw_data):
             return False
 
-        def construct(self, raw_data):
-            return
-
+    # represents a coproduct (or) type from two component types 
     class kor(KType):
         instances = {}
 
@@ -324,7 +444,7 @@ class KTypes(metaclass=MetaType):
         def _inr(self, token):
             return KTypes.Token(("inr", token), self)
 
-
+    # represents a n-product type from n components given in a dict
     class kmeta(KType):
         instances = {}
 
@@ -361,43 +481,154 @@ class KTypes(metaclass=MetaType):
         def matches(self, raw_data):
             raise Excpetion("cannot match token of KType.None")
 
+
+    class kuniverse(KType):
+        def __init__(self, index):
+            super().__init__(None)
+            self.index = index
+            self.name = f"universe {index}"
+            self.ktypes = []
+
+        def where(self, predicate):
+            return
+
+        def matches(self, raw_data):
+            return False
+
+        def construct(self, raw_data):
+            return
+
+
+
+
+
+
+
+    ############################################################################
+    ############################################################################
+    ############################################################################
+    # module global helper methods
+
+    universe = {"int": kint(), "str": kstr(), "none": knone()}
+
+    # add [ktype] to the universe with [name] and [hash] defining the dict key
+    def _add_type_to_universe(name, ktype, hash=""):
+        KTypes.universe[name+str(hash)] = ktype
         
 
-    class kint(KType):
-        instances = {}
+    def _get_function_in_universe(signature):
+        for name, ktype in KTypes.universe.items():
+            if isinstance(ktype, KTypes.kfunc) and ktype.signature == signature:
+                return ktype
+        func = KTypes.kfunc(signature)
+        KTypes._add_type_to_universe(func.name, func)
 
-        def __init__(self, predicate=None):
-            super().__init__(predicate)
-            self.name = "int"
+        return func
 
-        def construct(self, raw_data):
-            return KTypes.Token(int(raw_data), self)
+    def _get_kmeta_in_universe(signature):
+        for name, ktype in KTypes.universe.items():
+            if isinstance(ktype, KTypes.kmeta) and ktype.signature == signature[:-1]:
+                return ktype
+        
+        # TODO: handle case where kmeta does not exist
+        return None
 
-        def matches(self, raw_data):
-            match = False
-            if " " in raw_data:
-                return False
+    def _add_type_to_dict(ktype, d):
+        if isinstance(ktype, KTypes.kor):
+            KTypes._add_type_to_dict(ktype.left, d)
+            KTypes._add_type_to_dict(ktype.right, d)
+        else:
+            d[ktype] = 1
 
-            try:
-                int(raw_data)
-                match = True
-            except Exception:
-                pass
+    def _get_kor_in_universe(a, b):
+        or_dict = {}
+        KTypes._add_type_to_dict(a, or_dict)
+        KTypes._add_type_to_dict(b, or_dict)
 
-            return match and self.predicate(raw_data)
+        for name, ktype in KTypes.universe.items():
+            if isinstance(ktype, KTypes.kor):
+                candidate_or_dict = {}
+                KTypes._add_type_to_dict(ktype, candidate_or_dict)
+                if candidate_or_dict == or_dict:
+                    return ktype
 
-    class kstr(KType):
-        instances = {}
+        # TODO: handle case where kor does not exist
+        return None
 
-        def __init__(self, predicate=None):
-            super().__init__(predicate)
-            self.name = "str"
+    def _typecheck(arg, ktype):
+        if ktype is None:
+            raise Exception("missing type")
 
-        def matches(self, raw_data):
-            return self.predicate(raw_data)
+        if isinstance(arg, KTypes.Token):
+            if not arg.is_a(ktype):
+                raise Exception("type mismatch")
+        
+        else:
+            if isinstance(ktype, KTypes.KType):
+                raise Exception("type mismatch")
+            else:
+                if not isinstance(arg, ktype):
+                    raise Exception("type mismatch")
+        
+        return True
 
-        def construct(self, raw_data):
-            return KTypes.Token(str(raw_data), self)
+    def _get_type_after_currying(old_ktype):
+        signature = old_ktype.signature[1:]
+        if len(signature) == 1:
+            return signature[0] 
+        else:
+            return KTypes._get_function_in_universe(signature)
+
+    ############################################################################
+    ############################################################################
+    ############################################################################
+    # module public interface
+
+    def function(func):
+        signature = list(func.__annotations__.values())
+        function_type = KTypes._get_function_in_universe(signature)
+        return KTypes.Token(KTypes._function_wrapper(func, function_type), function_type)
+
+    def ind_prod(func):
+        ktype = KTypes._get_kmeta_in_universe(func.ktype.signature)
+
+        @KTypes.function
+        def klambda(x : ktype) -> func.ktype.signature[-1]:
+            return func(*list(x.value.values()))
+        
+        return klambda
+
+    def product(dict_spec):
+        name = " & ".join(map(str, dict_spec.values()))
+        ktype = KTypes.kmeta(name, dict_spec)
+        KTypes._add_type_to_universe(name, ktype, hash=hash(tuple(dict_spec.values())))
+        return ktype
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ############################################################################
+    ############################################################################
+    ############################################################################
+    # parsing
 
     class parser():
         def __init__(self, ktype, parse_format):
@@ -527,89 +758,3 @@ class KTypes(metaclass=MetaType):
                         return result
 
             return self.stream_tokens
-
-    universe = {"int": kint(), "str": kstr(), "none": knone()}
-
-    def _get_function_in_universe(signature):
-        for name, ktype in KTypes.universe.items():
-            if isinstance(ktype, KTypes.kfunc) and ktype.signature == signature:
-                return ktype
-        func = KTypes.kfunc(signature)
-        KTypes._add_type_to_universe(func.name, func)
-
-        return func
-
-    def _get_kmeta_in_universe(signature):
-        for name, ktype in KTypes.universe.items():
-            if isinstance(ktype, KTypes.kmeta) and ktype.signature == signature[:-1]:
-                return ktype
-        
-        # TODO: handle case where kmeta does not exist
-        return None
-
-    def _add_type_to_dict(ktype, d):
-        if isinstance(ktype, KTypes.kor):
-            KTypes._add_type_to_dict(ktype.left, d)
-            KTypes._add_type_to_dict(ktype.right, d)
-        else:
-            d[ktype] = 1
-
-    def _get_kor_in_universe(a, b):
-        or_dict = {}
-        KTypes._add_type_to_dict(a, or_dict)
-        KTypes._add_type_to_dict(b, or_dict)
-
-        for name, ktype in KTypes.universe.items():
-            if isinstance(ktype, KTypes.kor):
-                candidate_or_dict = {}
-                KTypes._add_type_to_dict(ktype, candidate_or_dict)
-                if candidate_or_dict == or_dict:
-                    return ktype
-
-        # TODO: handle case where kor does not exist
-        return None
-
-
-    def _typecheck(arg, ktype):
-        if ktype is None:
-            raise Exception("missing type")
-
-        if isinstance(arg, KTypes.Token):
-            if not arg.is_a(ktype):
-                raise Exception("type mismatch")
-        
-        else:
-            if isinstance(ktype, KTypes.KType):
-                raise Exception("type mismatch")
-            else:
-                if not isinstance(arg, ktype):
-                    raise Exception("type mismatch")
-        
-        return True
-
-    def function(func):
-        signature = list(func.__annotations__.values())
-        function_type = KTypes._get_function_in_universe(signature)
-        return KTypes.Token(KTypes._function_wrapper(func, function_type), function_type)
-
-    def _get_type_after_currying(old_ktype):
-        signature = old_ktype.signature[1:]
-        if len(signature) == 1:
-            return signature[0] 
-        else:
-            return KTypes._get_function_in_universe(signature)
-
-    def ind_prod(func):
-        ktype = KTypes._get_kmeta_in_universe(func.ktype.signature)
-
-        @KTypes.function
-        def klambda(x : ktype) -> func.ktype.signature[-1]:
-            return func(*list(x.value.values()))
-        
-        return klambda
-
-    def product(dict_spec):
-        name = " & ".join(map(str, dict_spec.values()))
-        ktype = KTypes.kmeta(name, dict_spec)
-        KTypes._add_type_to_universe(name, ktype, hash=hash(tuple(dict_spec.values())))
-        return ktype

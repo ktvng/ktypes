@@ -16,12 +16,15 @@ class colors:
 
 g_reports = None
 
-def run():
+def run(*args):
     failed_tests = []
     successes = 0
     total = 0
     random.shuffle(tests)
     for test in tests:
+        if args:
+            if not test.__name__ in args:
+                continue
         global g_reports
         g_reports = []
         test()
@@ -33,6 +36,9 @@ def run():
             else:
                 print(colors.GREEN + "." + colors.END, end="")
                 successes += 1
+    if total == 0:
+        print(colors.YELLOW + "no tests reporting" + colors.END)
+        return
     print()
     print(colors.YELLOW + f"{total} reporting, " + \
         colors.GREEN + f"{successes} succeeded ({int(100*successes/total)}%), " + \
@@ -50,6 +56,7 @@ def unit_test(f):
         return f(*args, **kwargs)
 
     wrapper.__doc__ = f.__doc__
+    wrapper.__name__ = f.__name__
     tests.append(wrapper)
 
     return None
@@ -82,6 +89,9 @@ def is_hello(raw_data):
 
 def contains_hello(raw_data):
     return "hello" in raw_data
+
+def is_dash(raw_data):
+    return raw_data == "-"
 
 @types.function
 def f(a : types.int, b : types.int, c: types.str) -> types.str:
@@ -200,7 +210,7 @@ def curry_functions():
     expect(f(a)(b)(c).value).to_equal("210 is the sum")
     expect(f(a, b, c).type).to_be(types.str)
 
-    expect(str(f(a, b))).to_be("lambda<f> : str -> str")
+    expect(str(f(a, b))).to_be("klambda<f> : str -> str")
 
 @unit_test
 def product_inductor():
@@ -262,3 +272,48 @@ def token_equality():
     or_token1 = or_type("594")
     or_token2 = or_type("594")
     expect(or_token1).to_be(or_token2)
+
+@unit_test
+def coproduct_function():
+    "tests creating a coproduct function"
+    @types.function
+    def f(a : types.int) -> types.str:
+        return types.str(a.value)
+    
+    @types.function
+    def g(b : types.str.where(size_eq=4)) -> types.str:
+        return b
+
+    @types.function
+    def h(b : types.str.where(predicate=is_dash)) -> types.str:
+        return types.str("NULL")
+
+    coprod = types.int | types.str.where(predicate=is_dash) | types.str.where(size_eq=4)
+    coprod_func = f | g | h
+    expect(coprod_func.type.signature[0]).to_be(coprod)
+    expect(coprod_func.type.signature[1]).to_be(types.str)
+
+    t1 = coprod("-")
+    print(t1)
+    exit()
+    print(coprod_func)
+    # expect(coprod_func(t1)).to_be("NULL")
+
+
+@unit_test
+def sandbox():
+    "sandbox test"
+    @types.function
+    def f(a : types.int) -> types.str:
+        return types.str(a.value)
+    
+    @types.function
+    def g(b : types.str) -> types.str:
+        return b
+    
+    y = (f | g)
+    q = types.int | types.str
+    # m = q("45")
+    # print(m)
+    # z= y(m)
+    # print(z)
