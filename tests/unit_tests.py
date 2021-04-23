@@ -20,7 +20,7 @@ def run(*args):
     failed_tests = []
     successes = 0
     total = 0
-    random.shuffle(tests)
+    # random.shuffle(tests)
     for test in tests:
         if args:
             if not test.__name__ in args:
