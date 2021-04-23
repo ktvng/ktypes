@@ -278,26 +278,29 @@ def coproduct_function():
     "tests creating a coproduct function"
     @types.function
     def f(a : types.int) -> types.str:
-        return types.str(a.value)
+        return types.str(-a.value)
     
     @types.function
     def g(b : types.str.where(size_eq=4)) -> types.str:
-        return b
+        return types.str(b.value)
 
     @types.function
     def h(b : types.str.where(predicate=is_dash)) -> types.str:
         return types.str("NULL")
 
-    coprod = types.int | types.str.where(predicate=is_dash) | types.str.where(size_eq=4)
+    coprod = types.int | types.str.where(size_eq=4) | types.str.where(predicate=is_dash)
     coprod_func = f | g | h
     expect(coprod_func.type.signature[0]).to_be(coprod)
     expect(coprod_func.type.signature[1]).to_be(types.str)
 
     t1 = coprod("-")
-    print(t1)
-    exit()
-    print(coprod_func)
-    # expect(coprod_func(t1)).to_be("NULL")
+    expect(coprod_func(t1)).to_be(types.str("NULL"))
+    t2 = coprod("four")
+    expect(coprod_func(t2)).to_be(types.str("four"))
+    t3 = coprod("4403")
+    expect(coprod_func(t3)).to_be(types.str("-4403"))
+
+
 
 
 @unit_test

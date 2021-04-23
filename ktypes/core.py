@@ -277,7 +277,7 @@ class KTypes(metaclass=MetaType):
                 return KTypes.Token(curried_func, curried_type)
             else:
                 result = self.func(*(self.args + [arg]), **self.kwargs)
-                KTypes._typecheck(result, self.func.__annotations__.get("return", None)) 
+                KTypes._typecheck(result, self.func.__annotations__.get("return", None))
                 return result
 
         # TODO: this is not updating self.ktype to the new ktype.
@@ -561,14 +561,7 @@ class KTypes(metaclass=MetaType):
 
         if isinstance(arg, KTypes.Token):
             if not arg.is_a(ktype):
-                raise Exception("type mismatch")
-        
-        else:
-            if isinstance(ktype, KTypes.KType):
-                raise Exception("type mismatch")
-            else:
-                if not isinstance(arg, ktype):
-                    raise Exception("type mismatch")
+                raise Exception(f"type mismatch: got <{str(arg)}> but expected <{str(ktype)}>")
         
         return True
 
