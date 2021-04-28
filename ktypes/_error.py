@@ -29,6 +29,9 @@ class ErrorHandler():
 
 
 class Error():
+    class _BaseException(Exception):
+        def __init__(self, msg):
+            self.msg = msg
     class OfTypeMismatch(Exception):
         def __init__(self, expected="", got=""):
             self.expected = expected
@@ -53,9 +56,32 @@ class Error():
         def __str__(self):
             return f"expected token of a type, but got {type(self.obj)}"
 
+    class OfArgument(Exception):
+        def __init__(self, expected_type=None, got=None):
+            self.expected = expected_type
+            self.got = got
+
+        def __str__(self):
+            return f"expected argument of {str(self.expected)} but got {type(self.got)}"
+
     class OfOrConstructorFailure(Exception):
         def __init__(self, msg):
             self.msg = msg
 
         def __str__(self):
-            return f"invalid 'or' usage: {msg}"
+            return f"invalid 'or' usage: {self.msg}"
+
+    class OfUndefinedAttribute(Exception):
+        def __init__(self, attr, ktype):
+            self.attr = attr
+            self.type = ktype
+
+        def __str__(self):
+            return f"invalid attribute: product type <{str(self.type)}> has no attribute '{self.attr}'"
+
+    class OfUncallable(Exception):
+        def __init__(self, msg):
+            self.msg = msg
+
+        def __str__(self):
+            return f"<{str(self.msg)}> is not callable"

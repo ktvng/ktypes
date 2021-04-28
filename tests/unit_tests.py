@@ -244,6 +244,29 @@ def product_inductor():
 
     expect(f_prod(p).value).to_equal("210 is the sum")
 
+@context
+def product_type():
+    @unit_test
+    def product_type_error_handling():
+        "tests failure to construct product type"
+    
+        bad_instance_dict = {
+            "a": types.int(10),
+            "b": types.int(200),
+            "d": types.str(" is the sum")
+        }
+
+        expect(product_ktype(bad_instance_dict)).is_instance(Error.OfTypeMismatch)
+        expect(product_ktype([])).is_instance(Error.OfArgument)    
+
+@unit_test
+def uncallable_types():
+    "tests that basic types are uncallable"
+    x = types.int(45) 
+    expect(x()).is_instance(Error.OfUncallable)
+    y = types.str("hello")
+    expect(y()).is_instance(Error.OfUncallable)
+
 @unit_test
 def instance_parser():
     "tests the auto generated parser for single instances"

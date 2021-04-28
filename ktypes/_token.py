@@ -29,7 +29,7 @@ class _Token():
         if self._is_func:
             return self.value(*args, **kwargs)
         else:
-            raise Exception("token is not callable")
+            return ErrorHandler.take(Error.OfUncallable(self))
 
     # test for equality of tokens
     def __eq__(self, o):
@@ -104,7 +104,7 @@ class _Token():
         if self._is_meta:
             attr = self.value.get(name, None)
             if attr is None:
-                raise Exception("no attribute")
+                return ErrorHandler.take(Error.OfUndefinedAttribute(name, self.type))
             return attr
         return getattr(self.value, name)
 
@@ -112,7 +112,7 @@ class _Token():
         if a._is_func and b._is_func:
             return a.value | b.value
 
-        raise Exception("cannot or tokens of non-function types")
+        return ErrorHandler.take(Error.OfOrConstructorFailure("can only or tokens of function types"))
 
     def _validate_binary_op(self, op, other):
         if not isinstance(other, _Token):

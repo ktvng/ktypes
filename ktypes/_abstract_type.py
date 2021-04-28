@@ -1,4 +1,5 @@
 import ktypes._kor as _kor
+from ktypes._error import Error, ErrorHandler
 
 # abstract class which is inherited by all types of the known type system. 
 # types are represented as instances of classes inheriting from <KType>
@@ -58,7 +59,7 @@ class KType():
     # type. will return existing predicate type if found.
     def where(self, predicate=None, size_eq=None, ends_on=None):
         if predicate is None and size_eq is None and ends_on is None:
-            raise Exception("predicate required")
+            return self
         
         predicates = []
         hashable_rep = []
