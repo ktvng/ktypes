@@ -1,4 +1,5 @@
 from ktypes import types
+from ktypes._error import ErrorHandler, Error
 import random
 
 tests = []
@@ -17,6 +18,7 @@ class colors:
 g_reports = None
 
 def run(*args):
+    ErrorHandler.set_response_instruct("pass")
     failed_tests = []
     successes = 0
     total = 0
@@ -61,6 +63,10 @@ def unit_test(f):
 
     return None
 
+def context(f):
+    f()
+
+
 class expect():
     def __init__(self, result):
         self.result = result
@@ -74,6 +80,13 @@ class expect():
 
     def to_be(self, val):
         self.to_equal(val)
+
+    def is_instance(self, type):
+        if self._knot:
+            reports(not isinstance(self.result, type))
+        else:
+            reports(isinstance(self.result, type))
+
 
     def knot(self):
         self._knot = True
@@ -203,14 +216,19 @@ def allow_named_types():
 def curry_functions():
     "tests function currying"
     expect(str(f)).to_equal("f : int -> int -> str -> str")
+    result = types.str("210 is the sum")
     a = types.int(10)
     b = types.int(200)
     c = types.str(" is the sum")
-    expect(f(a, b, c).value).to_equal("210 is the sum")
-    expect(f(a)(b)(c).value).to_equal("210 is the sum")
+    expect(f(a, b, c)).to_equal(result)
+    expect(f(a)(b)(c)).to_equal(result)
     expect(f(a, b, c).type).to_be(types.str)
 
     expect(str(f(a, b))).to_be("klambda<f> : str -> str")
+
+    g = f(a)
+    expect(g(b, c)).to_equal(result)
+    expect(g(b)(c)).to_equal(result)
 
 @unit_test
 def product_inductor():
@@ -273,9 +291,8 @@ def token_equality():
     or_token2 = or_type("594")
     expect(or_token1).to_be(or_token2)
 
-@unit_test
-def coproduct_function():
-    "tests creating a coproduct function"
+@context
+def coproducts_on_functions():
     @types.function
     def f(a : types.int) -> types.str:
         return types.str(-a.value)
@@ -288,21 +305,76 @@ def coproduct_function():
     def h(b : types.str.where(predicate=is_dash)) -> types.str:
         return types.str("NULL")
 
-    coprod = types.int | types.str.where(size_eq=4) | types.str.where(predicate=is_dash)
-    coprod_func = f | g | h
-    expect(coprod_func.type.signature[0]).to_be(coprod)
-    expect(coprod_func.type.signature[1]).to_be(types.str)
+    @types.function
+    def a(x : types.str, y : types.str) -> types.str:
+        return y
 
-    t1 = coprod("-")
-    expect(coprod_func(t1)).to_be(types.str("NULL"))
-    t2 = coprod("four")
-    expect(coprod_func(t2)).to_be(types.str("four"))
-    t3 = coprod("4403")
-    expect(coprod_func(t3)).to_be(types.str("-4403"))
+    @types.function
+    def b(x : types.int) -> types.str:
+        return types.str("-")
 
+    @types.function
+    def c(x : types.int) -> types.int:
+        return x
+
+    @unit_test
+    def coproduct_function_failure_cases():
+        "tests function or constructor failure cases"
+        expect(a | f).is_instance(Error.OfOrConstructorFailure)
+        expect(b | f).is_instance(Error.OfOrConstructorFailure)
+        expect(c | g).is_instance(Error.OfOrConstructorFailure)
+
+    @unit_test
+    def coproduct_function():
+        "tests creating a coproduct function"
+        coprod = types.int | types.str.where(size_eq=4) | types.str.where(predicate=is_dash)
+        coprod_func = f | g | h
+        expect(coprod_func.type.signature[0]).to_be(coprod)
+        expect(coprod_func.type.signature[1]).to_be(types.str)
+
+        t1 = coprod("-")
+        expect(coprod_func(t1)).to_be(types.str("NULL"))
+        t2 = coprod("four")
+        expect(coprod_func(t2)).to_be(types.str("four"))
+        t3 = coprod("4403")
+        expect(coprod_func(t3)).to_be(types.str("-4403"))
+
+@context
+def basic_ops():
+    int1 = types.int(10)
+    int2 = types.int(15)
+
+    str1 = types.str("hello")
+    str2 = types.str(" world")
+
+    @unit_test
+    def addition():
+        "tests adding basic types"
+        expect(int1 + int2).to_be(types.int(25))
+        expect(str1 + str2).to_be(types.str("hello world"))
+        expect(int1 + str1).is_instance(Error.OfBinaryOperation)
+
+    @unit_test
+    def subtraction():
+        "tests subtracting basic types"
+        expect(int1 - int2).to_be(types.int(-5))
+        expect(str1 - str2).is_instance(Error.OfBinaryOperation)
+
+    @unit_test
+    def multiplication():
+        "tests multipyling basic types"
+        expect(int1 * int2).to_be(types.int(150))
+        expect(str1 * str2).is_instance(Error.OfBinaryOperation)
+
+    @unit_test
+    def division():
+        "tests dividing basic types"
+        expect(types.int(30) / int2).to_be(types.int(2))
+        expect(str1 / str2).is_instance(Error.OfBinaryOperation)
 
 
 
 @unit_test
 def sandbox():
     "sandbox test"
+    expect(True).to_be(True)

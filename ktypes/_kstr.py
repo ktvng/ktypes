@@ -1,5 +1,6 @@
 from ktypes._abstract_type import KType
 from ktypes._token import _Token
+from ktypes._error import Error, ErrorHandler
 
 
 # basic ktype for string values
@@ -28,3 +29,14 @@ class kstr(KType):
     def construct(self, raw_data):
         return _Token(str(raw_data), self)
 
+    def add(self, token1, token2):
+        return _Token(token1.value + token2.value, self)
+
+    def subtract(self, token1, token2):
+        return ErrorHandler.take(Error.OfBinaryOperation("-", token1.type, token2.type))
+
+    def multiply(self, token1, token2):
+        return ErrorHandler.take(Error.OfBinaryOperation("-", token1.type, token2.type))
+
+    def divide(self, token1, token2):
+        return ErrorHandler.take(Error.OfBinaryOperation("-", token1.type, token2.type))

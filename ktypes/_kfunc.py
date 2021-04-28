@@ -1,5 +1,6 @@
 from ktypes._abstract_type import KType
 from ktypes._token import _Token
+from ktypes._error import Error, ErrorHandler
 
 # represents a function/curried-function for multiple arguments
 class kfunc(KType):
@@ -34,11 +35,11 @@ class _function_wrapper():
 
     def _typecheck(self, arg, ktype):
         if ktype is None:
-            raise Exception("missing type")
+            raise Exception("internal: missing type")
 
         if isinstance(arg, _Token):
             if not arg.is_a(ktype):
-                raise Exception(f"type mismatch: got <{str(arg)}> but expected <{str(ktype)}>")
+                ErrorHandler.raises(Error.OfTypeMismatch(expected=ktype, got=arg))
         
         return True
 
@@ -80,19 +81,19 @@ class _function_wrapper():
 
     def __or__(a, b):
         if len(a.ktype.signature) != 2 or len(b.ktype.signature) != 2:
-            raise Exception("cannot 'or' curried-functions")
+            return ErrorHandler.take(Error.OfOrConstructorFailure("cannot 'or' curried-functions"))
 
         a_returns = a.ktype.signature[-1]
         b_returns = b.ktype.signature[-1]
 
         if a_returns != b_returns:
-            raise Exception("cannot 'or' functions with different return values")
+            return ErrorHandler.take(Error.OfOrConstructorFailure("cannot 'or' functions with differing return types"))
 
         a_domain_type = a.ktype.signature[0]
         b_domain_type = b.ktype.signature[0]
 
         if a_domain_type == b_domain_type:
-            raise Exception("cannot 'or' functions defined over the same domain")
+            return ErrorHandler.take(Error.OfOrConstructorFailure("cannot 'or' functions defined over the same domain"))
 
         @_function_wrapper.wrap(a.ktype.universe)
         def klambda(x : a_domain_type | b_domain_type) -> a_returns:

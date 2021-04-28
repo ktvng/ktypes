@@ -36,3 +36,15 @@ class kint(KType):
             return self.predicate(raw_data)
         except Exception:
             return False
+    
+    def add(self, token1, token2):
+        return _Token(token1.value + token2.value, self)
+
+    def subtract(self, token1, token2):
+        return _Token(token1.value - token2.value, self)
+
+    def multiply(self, token1, token2):
+        return _Token(token1.value * token2.value, self)
+
+    def divide(self, token1, token2):
+        return _Token(token1.value / token2.value, self)

@@ -1,4 +1,5 @@
 
+from ktypes._error import Error, ErrorHandler
 # class used to represent tokens of a given type. contains a value of some 
 # data and a reference to the type of that value.
 #
@@ -113,4 +114,38 @@ class _Token():
 
         raise Exception("cannot or tokens of non-function types")
 
+    def _validate_binary_op(self, op, other):
+        if not isinstance(other, _Token):
+            return ErrorHandler.take(Error.OfExpectedToken(other))
+        if self.type != other.type:
+            return ErrorHandler.take(Error.OfBinaryOperation(op, self.type, other.type))
 
+        return None
+
+    def __add__(self, other):
+        result = self._validate_binary_op("+", other)
+        if result is not None:
+            return result
+
+        return self.type.add(self, other)
+
+    def __sub__(self, other):
+        result = self._validate_binary_op("-", other)
+        if result is not None:
+            return result
+
+        return self.type.subtract(self, other)
+
+    def __mul__(self, other):
+        result = self._validate_binary_op("*", other)
+        if result is not None:
+            return result
+
+        return self.type.multiply(self, other)
+
+    def __truediv__(self, other):
+        result = self._validate_binary_op("/", other)
+        if result is not None:
+            return result
+
+        return self.type.divide(self, other)
