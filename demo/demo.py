@@ -3,16 +3,21 @@ def clear():
     x = input()
     print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
 
-
+print("press enter to cycle through the demo")
 clear()
+
 
 ################################################################################
 # Defining a type with a predicate
 types.nan = types.str.where(lambda x: x == "--")
 
+
+
 ################################################################################
 # Defining a coproduct type
 types.maybe_age = types.int | types.nan
+
+
 
 ################################################################################
 # Defining a product type
@@ -24,6 +29,8 @@ types.site_user = {
     "age": types.maybe_age,
     "ip_address": types.str.where(ends_on="\n")
 }
+
+
 
 ################################################################################
 # Parsing
@@ -38,6 +45,8 @@ with open("demo/demo_data.csv") as f:
 for i in range(0, 5):
     print(tokens[i])
 clear()
+
+
 
 ################################################################################
 # Defining a function on coproduct types
@@ -55,11 +64,13 @@ print(age_to_str)
 clear()
 
 
+
 ################################################################################
 # Typecasting between convertable types
 @types.function
 def typecast_str(x : types.str.where(ends_on=",")) -> types.str:
     return types.str(x.value)
+
 
 
 ################################################################################
@@ -75,6 +86,7 @@ print(add5)
 
 print(add5(types.int(15)))
 clear()
+
 
 
 @types.function
