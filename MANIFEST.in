@@ -1,0 +1,2 @@
+exclude rundemo.py
+exclude runtests.py
