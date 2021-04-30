@@ -20,6 +20,12 @@ following command.
 python3 -m pip install ktypes
 ```
 
+## Tests
+Tests are written in a lightweight, custom (read: informal) unit-test framework, and can be run via the following command in the root directory
+```
+python3 runtests.py
+```
+
 ## Usage
 To use KTypes in your file, simply import the `types` submodule from the `ktypes` 
 module as below. All types inhereted through the `types` submodule
