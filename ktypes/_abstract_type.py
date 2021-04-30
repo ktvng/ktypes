@@ -117,3 +117,4 @@ class KType():
     # returns a string representation of the type <self> 
     def __str__(self):
         return self.name + self._predicate_designation()
+        
