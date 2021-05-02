@@ -20,8 +20,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'KTypes'
-copyright = '2021, ktvng'
-author = 'ktvng'
+copyright = '2021, Kevin Tang'
+author = 'Kevin Tang'
 
 # The short X.Y version
 version = ''
@@ -84,7 +84,10 @@ html_theme = 'alabaster'
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    "description": "Type-theoretic Data Annotations",
+    "fixed_sidebar": True,
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
