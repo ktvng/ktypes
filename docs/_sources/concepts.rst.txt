@@ -7,6 +7,12 @@ A zero-to-sixty guide on getting up to speed with the KTypes Library.
 Getting Started
 ===============
 
+Install the KTypes library with ``pip``
+
+.. code-block:: bash
+
+    $ python3 -m pip install ktypes
+
 To use the KTypes library, import the ``types`` submodule:
 
 .. code-block:: python

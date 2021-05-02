@@ -41,11 +41,22 @@
 
 
 
-<h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="definitions.html">Definitions</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Concepts</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Concepts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#getting-started">Getting Started</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#primitive-types">Primitive Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#constructions">Constructions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#product-types">Product Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#coproduct-types">Coproduct Types</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
 <div class="relations">
@@ -79,6 +90,10 @@
 <p>A zero-to-sixty guide on getting up to speed with the KTypes Library.</p>
 <div class="section" id="getting-started">
 <h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
+<p>Install the KTypes library with <code class="docutils literal notranslate"><span class="pre">pip</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python3 -m pip install ktypes
+</pre></div>
+</div>
 <p>To use the KTypes library, import the <code class="docutils literal notranslate"><span class="pre">types</span></code> submodule:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ktypes</span> <span class="kn">import</span> <span class="n">types</span>
 </pre></div>
