@@ -19,6 +19,12 @@ class kor(KType):
         return self.left.matches(raw_data) or self.right.matches(raw_data)
 
     def construct(self, raw_data):
+        if isinstance(raw_data, _Token):
+            if raw_data.is_a(self.left):
+                return self._inl(raw_data)
+            elif raw_data.is_a(self.right):
+                return self._inr(raw_data)
+                
         if self.left.matches(raw_data):
             return self._inl(self.left.construct(raw_data))
         elif self.right.matches(raw_data):
