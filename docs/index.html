@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Welcome to KTypes’s documentation! &#8212; KTypes 0.0.1 documentation</title>
+    <title>KnownTypes Documentation &#8212; KTypes 0.0.1 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -26,40 +26,15 @@
 <link rel="stylesheet" href="_static/doc_style.css" type="text/css" />
 
   </head><body>
-  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
-  <div class="section" id="welcome-to-ktypes-s-documentation">
-<h1>Welcome to KTypes’s documentation!<a class="headerlink" href="#welcome-to-ktypes-s-documentation" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
-</ul>
-</div>
-</div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
-<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
-<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
-</ul>
-</div>
-
-
-          </div>
-        </div>
-      </div>
+  <div class="document">
+    
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
 <h1 class="logo"><a href="#">KTypes</a></h1>
 
 
+
+<p class="blurb">Type-theoretic Data Annotations</p>
 
 
 
@@ -67,9 +42,10 @@
 
 
 <h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="definitions.html">Definitions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concepts.html">Concepts</a></li>
 </ul>
 
 <div class="relations">
@@ -94,10 +70,63 @@
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="knowntypes-documentation">
+<h1>KnownTypes Documentation<a class="headerlink" href="#knowntypes-documentation" title="Permalink to this headline">¶</a></h1>
+<p>KnownTypes or KTypes is a an Python open-source library which provides a framework to
+define data and functions types inside a formal type theoretic framework. Typed-specified
+objects and contexts coexist with standard dynamically-typed Python statements,
+allowing for seemelss transitions between formally-typed and dynamically-typed
+code. Robust runtime type-checking ensures type-correctness during data manipulations.</p>
+<p>All KTypes annotations are built into the standard Python syntax, and the entire
+KTypes type-universe is implemented natively, making KTypes quick and easy for both
+experienced and novice Python developers to pick and master.</p>
+<p>This webpage provides in-depth documentation and a zero-to-sixty tutorial behind
+the basics of Formal Type Theory and how KTypes leverages these concepts. Working through
+these tutorial pages provides the user everything they need to understand the
+fundemental logic of the KTypes system in order both appreciate Formal Type Theory and
+get started using the KTypes library in their own Python projects.</p>
+<ul class="simple">
+<li>Start with the <strong>Overview</strong> to gain a better understanding of Formal Type Theory,
+and why everyone should use formal type specifications in critical path code</li>
+<li>Check on the <strong>Definitions</strong> for a reference on terminology</li>
+<li><strong>Concepts</strong> introduces more detailed Type Theory in the context of the KTypes library
+and its own implementation. Jump to here if you have a working understanding of Type
+Theory and just want to see how the KTypes library works in action.</li>
+</ul>
+<div class="section" id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="definitions.html">Definitions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concepts.html">Concepts</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="version-notes">
+<h2>Version Notes<a class="headerlink" href="#version-notes" title="Permalink to this headline">¶</a></h2>
+<p>The KTypes library is currently in the pre-alpha phase (V0.0.xx). All framework API are subject
+to change without notice. Please do not integrate KTypes into your projects just yet!</p>
+</div>
+<div class="section" id="author">
+<h2>Author<a class="headerlink" href="#author" title="Permalink to this headline">¶</a></h2>
+<p>The KTypes library is written and maintained by Kevin Tang (ktvng). If you would like to
+contribute, please check us out on <a class="reference external" href="https://github.com/ktvng/ktypes">Github</a>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
     <div class="footer">
-      &copy;2021, ktvng.
+      &copy;2021, Kevin Tang.
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
