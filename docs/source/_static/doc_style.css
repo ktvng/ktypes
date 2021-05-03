@@ -2,20 +2,23 @@ html {
     overflow-y: scroll;
 }
 
-body {
-    font-family: Georgia, 'Times New Roman', Times, serif;
-}
-
 div.body{
     margin-top: 10px;
+    width: 80%;
 }
 
-div.body h1, div.body h2, div.body h3, div.body h4, div.body h5, div.body h6 {
-    font-family: Georgia, 'Times New Roman', Times, serif;
+div.sphinxsidebarwrapper p.blurb {
+    font-style: italic;
+    margin-top: 45px;
 }
 
-div.sphinxsidebar h3, div.sphinxsidebar h4 {
-    font-family: Georgia, 'Times New Roman', Times, serif;
+ul, ol {
+    margin: 10px 0 0px 30px;
+    padding: 0;
+}
+
+a.reference {
+    line-height: 0px;
 }
 
 div.document {
@@ -29,32 +32,53 @@ div.sphinxsidebarwrapper {
 div.sphinxsidebarwrapper h1.logo {
     text-align: right;
     margin-bottom: 5px;
+    border-top: solid;
+    border-top-width: 3px;
+    border-color: #3E4349;
+    padding-top: 5px;
+    width: 150px;
+    float: right;
+    font-size: 26px;
 }
 
 div.sphinxsidebar {
     width: 220px;
     font-size: 14px;
     line-height: 1.5;
-    border-top-style: solid;
-    border-top-width: 2px;
 }
 
 div.sphinxsidebar ul{
-    color: white;
     list-style-type: none;
 }
 
+div.sphinxsidebar ul ul {
+    list-style-type: inherit;
+}
+
 div.sphinxsidebar ul li.toctree-l1 > a {
+    list-style-type: none;
     font-size: 160%;
-    line-height: 160%;
+    line-height: 170%;
 }
 
 div.sphinxsidebar ul li.toctree-l2 > a {
-    font-size: 110%;
+    font-size: 120%;
     line-height: 130%;
 }
 
+div.sphinxsidebar ul li.toctree-l2 {
+    margin-top: 5px;
+}
+
 div.sphinxsidebar ul li.toctree-l3 > a {
-    font-size: 80%;
-    line-height: 110%;
+    font-size: 90%;
+    line-height: 80%;
+}
+
+div.toctree-wrapper.compound ul li.toctree-l2 > a {
+    font-size: 85%;
+}
+
+div.toctree-wrapper.compound ul li.toctree-l3 > a {
+    font-size: 85%;
 }

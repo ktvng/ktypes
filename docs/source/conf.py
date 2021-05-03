@@ -87,6 +87,8 @@ html_theme = 'alabaster'
 html_theme_options = {
     "description": "Type-theoretic Data Annotations",
     "fixed_sidebar": True,
+    "font_family": "Georgia, serif",
+    "head_font_family": "Georgia, serif"
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
