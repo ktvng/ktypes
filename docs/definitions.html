@@ -1,0 +1,214 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Definitions &#8212; KTypes 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Concepts" href="concepts.html" />
+    <link rel="prev" title="Overview" href="overview.html" />
+
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+<link rel="stylesheet" href="_static/doc_style.css" type="text/css" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">KTypes</a></h1>
+
+
+
+<p class="blurb">Type-theoretic Data Annotations</p>
+
+
+
+
+
+
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Definitions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#type-known-type">Type/Known Type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#token">Token</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#formal-function">Formal Function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#currying">Currying</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#signature">Signature</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#product-type">Product Type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#coproduct-type">Coproduct Type</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="concepts.html">Concepts</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="overview.html" title="previous chapter">Overview</a></li>
+      <li>Next: <a href="concepts.html" title="next chapter">Concepts</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="definitions">
+<h1>Definitions<a class="headerlink" href="#definitions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="type-known-type">
+<h2>Type/Known Type<a class="headerlink" href="#type-known-type" title="Permalink to this headline">¶</a></h2>
+<p>Defining a type is more or less a philosophical (read: ontological) problem. In a
+sense, a type embodies some abstract, universalizing category or classification. A type <span class="math notranslate nohighlight">\(T\)</span>
+can be thought of as a property which chan be shared by one or many particulars, each
+of which would be said to have type <span class="math notranslate nohighlight">\(T\)</span>.</p>
+<p>The above definition is appealing in its simplicity, but it obscures the fact that a type
+should be understood as more intrinsic an a mere property. Rather, the type of an object
+conveys some essential characteristic; each object can only have one type.</p>
+<p>This relationship can be colloquially expressed with the “is a(n)” relation. If an object
+<span class="math notranslate nohighlight">\(s\)</span> has type <span class="math notranslate nohighlight">\(T\)</span>, (denoted by the judgement <span class="math notranslate nohighlight">\(s : T\)</span>), then we can say
+<span class="math notranslate nohighlight">\(s\)</span> is a(n) <span class="math notranslate nohighlight">\(T\)</span>. Concretely, given the judgement <span class="math notranslate nohighlight">\(x : \text{int}\)</span>, we
+can that <span class="math notranslate nohighlight">\(x\)</span> is a(n) <span class="math notranslate nohighlight">\(\text{int}\)</span>.</p>
+<p>Again, while this relation is simple and expressive, one must be careful in that
+while everyday objects can have multiple “is a(n)” relations, a type is fixed and
+unique. So while we can speak of a person, say Susan, both with “Susan is a person”, and
+“Susan is a student”, this is disallowed in Formal Type Theory. Each object/particular
+may only have one type.</p>
+<p>While this may seem restrictive in some senses, it is actually a very powerful notion.
+If we know that <span class="math notranslate nohighlight">\(x\)</span> is a(n) <span class="math notranslate nohighlight">\(\text{int}\)</span>, that is, if we have the judgement
+<span class="math notranslate nohighlight">\(x : \text{int}\)</span>, then even without knowing what the variable <span class="math notranslate nohighlight">\(x\)</span> is specifically,
+we already know that we use addition, multiplication, etc, or that we can compare <span class="math notranslate nohighlight">\(x\)</span>
+to another integer <span class="math notranslate nohighlight">\(y\)</span>. All of this knowledge stems from the fact that <span class="math notranslate nohighlight">\(x : \text{int}\)</span>
+is a powerful judgement: the <span class="math notranslate nohighlight">\(\text{int}\)</span> type conveys a lot of information.</p>
+<p>In the KTypes library, a <strong>known type</strong> is the terminology used when talking about a
+formally expressed type which is defined in a way such that the KTypes library can interpret
+it and its properties. The KTypes library has three primitive known types built-in,
+<code class="docutils literal notranslate"><span class="pre">types.int</span></code>, <code class="docutils literal notranslate"><span class="pre">types.str</span></code>, and <code class="docutils literal notranslate"><span class="pre">types.float</span></code>, defined in this way to avoid collisions
+with the standard Python implementations of <code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code>, and <code class="docutils literal notranslate"><span class="pre">float</span></code>, which
+are not usable in the KTypes framework and hence “unknown types”.</p>
+</div>
+<div class="section" id="token">
+<h2>Token<a class="headerlink" href="#token" title="Permalink to this headline">¶</a></h2>
+<p>A token is an instance or a particular object of a type. In the judgment <span class="math notranslate nohighlight">\(s : T\)</span>,
+we know that <span class="math notranslate nohighlight">\(T\)</span> is a type, and correspondingly, we also get that <span class="math notranslate nohighlight">\(s\)</span> is
+a token of this type.</p>
+<p>Of course, a given type may have many different tokens. As an example, we can write
+the two judgments <span class="math notranslate nohighlight">\(42 : \text{int}\)</span> and <span class="math notranslate nohighlight">\(12 : \text{int}\)</span>, which tells us
+that both <span class="math notranslate nohighlight">\(42\)</span> and <span class="math notranslate nohighlight">\(12\)</span> are tokens of the <span class="math notranslate nohighlight">\(\text{int}\)</span> type.</p>
+</div>
+<div class="section" id="formal-function">
+<h2>Formal Function<a class="headerlink" href="#formal-function" title="Permalink to this headline">¶</a></h2>
+<p>A formal function is Python method which has been appropriately defined and decorated
+in order for the KTypes framework to interpret it as a well-typed token of a function
+type. While formal functions are simply Python methods at core, and obey standard
+Pythonic syntax, they are useful because they ensure that data manipulations on known
+types are well behaved; formal functions are subject to runtime type-checking, and by
+using formal functions, one can be confident that one’s data manipulations preserve
+certain defined type relationships.</p>
+<p>Formal functions are tokens of function types. Type theoretically, functions are notated
+by the judgement <span class="math notranslate nohighlight">\(f : A \to B\)</span>. This judgement tells us that a function <span class="math notranslate nohighlight">\(f\)</span>
+has domain <span class="math notranslate nohighlight">\(A\)</span> and range <span class="math notranslate nohighlight">\(B\)</span>. Printing formal functions of the KTypes library
+follows this notation, one would see <code class="docutils literal notranslate"><span class="pre">f</span> <span class="pre">:</span> <span class="pre">A</span> <span class="pre">-&gt;</span> <span class="pre">B</span></code>. Note that <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span>
+must be known types.</p>
+<p>Formal functions also curry by default.</p>
+<div class="section" id="currying">
+<h3>Currying<a class="headerlink" href="#currying" title="Permalink to this headline">¶</a></h3>
+<p>Currying is the technique by which methods defined with multiple arguments can be
+represented by formal functions. In the definition of a formal function above, there is
+no simple way to express a function defined from two types. That is, the judgement
+<span class="math notranslate nohighlight">\(f : A, A' \to B\)</span> is not well defined. Instead, currying is employed.</p>
+<p>Recall that formal functions are tokens of a function type. Given <span class="math notranslate nohighlight">\(f : A \to B\)</span>,
+we can say that <span class="math notranslate nohighlight">\(f\)</span> is a token of type <span class="math notranslate nohighlight">\(A \to B\)</span> where <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span>
+are both known types.</p>
+<p>We can make a similar statement given the judgement <span class="math notranslate nohighlight">\(g : A' \to C\)</span>. The key insight,
+then, is that the known types <span class="math notranslate nohighlight">\(A, A', B, C\)</span> have no restrictions built in. Thus
+because <span class="math notranslate nohighlight">\(A \to B\)</span> is itself a type, we can treat it as such. In fact, we can
+even let the type <span class="math notranslate nohighlight">\(C\)</span> be this type, <span class="math notranslate nohighlight">\(A \to B\)</span>.</p>
+<p>What we would obtain is the function <span class="math notranslate nohighlight">\(g : A' \to (A \to B)\)</span>. This statements
+states that <span class="math notranslate nohighlight">\(g\)</span> is a function which takes in a token of type <span class="math notranslate nohighlight">\(A'\)</span> and
+returns a <em>function</em> from <span class="math notranslate nohighlight">\(A \to B\)</span>. This function moreover, has access
+to the value which was supplied into <span class="math notranslate nohighlight">\(g\)</span>, and one can see that we have effectively
+defined a function over two types.</p>
+<p>As is standard practice, we omit the parenthesis when providing the judgement for
+<span class="math notranslate nohighlight">\(g\)</span> and instead write <cite>g : A’ to A to B</cite></p>
+</div>
+<div class="section" id="signature">
+<h3>Signature<a class="headerlink" href="#signature" title="Permalink to this headline">¶</a></h3>
+<p>A signature is a representation of either a product type or a function type. A
+signature, plus the knowledge of whether a type is product or function, supplies
+the necessary information to infer the exact designation of the type. In product
+types, schema is often used synonymously with signature, highlighting the similarity
+of product types to database schemas.</p>
+</div>
+</div>
+<div class="section" id="product-type">
+<h2>Product Type<a class="headerlink" href="#product-type" title="Permalink to this headline">¶</a></h2>
+<p>The Cartesian product of two sets <span class="math notranslate nohighlight">\(A, B\)</span> is the set of ordered pairs <span class="math notranslate nohighlight">\((a, b)\)</span>
+where <span class="math notranslate nohighlight">\(a\)</span> is taken from <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b\)</span> taken from <span class="math notranslate nohighlight">\(B\)</span>. The product
+type on types parallels this construction.</p>
+</div>
+<div class="section" id="coproduct-type">
+<h2>Coproduct Type<a class="headerlink" href="#coproduct-type" title="Permalink to this headline">¶</a></h2>
+<p>The coproduct on types <span class="math notranslate nohighlight">\(A, B\)</span> is effectively the “or” or “union” of two types.
+That is, a token of the coproduct type denoted <span class="math notranslate nohighlight">\(A | B\)</span> is the either a token of
+<span class="math notranslate nohighlight">\(A\)</span>, or <span class="math notranslate nohighlight">\(B\)</span> which has been injected into the coproduct type using the
+<span class="math notranslate nohighlight">\(inl\)</span> or <span class="math notranslate nohighlight">\(inr\)</span> functions, standing for left/right injection, respectively.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2021, Kevin Tang.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="_sources/definitions.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

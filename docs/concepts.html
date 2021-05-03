@@ -1,0 +1,559 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Concepts &#8212; KTypes 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Definitions" href="definitions.html" />
+
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+<link rel="stylesheet" href="_static/doc_style.css" type="text/css" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">KTypes</a></h1>
+
+
+
+<p class="blurb">Type-theoretic Data Annotations</p>
+
+
+
+
+
+
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="definitions.html">Definitions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Concepts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#getting-started">Getting Started</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#primitive-types">Primitive Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#constructions">Constructions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#product-types">Product Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#coproduct-types">Coproduct Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#product-functions">Product Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#coproduct-functions">Coproduct Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#predicates">Predicates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#parsing">Parsing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#instance">Instance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stream">Stream</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="definitions.html" title="previous chapter">Definitions</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="concepts">
+<h1>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline">¶</a></h1>
+<p>A zero-to-sixty guide on getting up to speed with the KTypes Library.</p>
+<div class="section" id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
+<p>Install the KTypes library with <code class="docutils literal notranslate"><span class="pre">pip</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python3 -m pip install ktypes
+</pre></div>
+</div>
+<p>To use the KTypes library, import the <code class="docutils literal notranslate"><span class="pre">types</span></code> submodule:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ktypes</span> <span class="kn">import</span> <span class="n">types</span>
+</pre></div>
+</div>
+<p>All known types, primitive and user-defined, are available as attributes of the
+<code class="docutils literal notranslate"><span class="pre">types</span></code> module. This provides a simple interface by which the formal types can be
+accessed while avoiding name collisions between Python objects and KTypes types.</p>
+<div class="section" id="primitive-types">
+<h3>Primitive Types<a class="headerlink" href="#primitive-types" title="Permalink to this headline">¶</a></h3>
+<p>Currently KTypes supports three primitive types; <code class="docutils literal notranslate"><span class="pre">str</span></code>, <code class="docutils literal notranslate"><span class="pre">int</span></code>, and <code class="docutils literal notranslate"><span class="pre">float</span></code> which
+can be accessed by attributing the <code class="docutils literal notranslate"><span class="pre">types</span></code> module. Using the same syntax to construct
+instances of standard Python objects, we can construct a new token of a known type.
+All we need to supply is a data instance matching the type we want to construct (e.g.
+for an int, we would supply a Python int), but when in doubt, KTypes constructors all
+support ingesting a string format as the data instance”</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="s2">&quot;53&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="c1"># 42 : int</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="c1"># 53 : int</span>
+</pre></div>
+</div>
+<p>Primitive types support basic operations (<code class="docutils literal notranslate"><span class="pre">+|-|*|/</span></code>) in the obvious way. If an
+operation is not generally well defined (e.g. subtracting strings), a library error
+will be thrown. Similarly, applying a basic operation on two tokens of different types
+will always throw an error. Unlike C/C++ or Java, KTypes does not support type coercion.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">str</span><span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">str</span><span class="p">(</span><span class="s2">&quot;world&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">y</span><span class="p">)</span>
+<span class="c1"># 48 : int</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">)</span>
+<span class="c1"># helloworld : str</span>
+</pre></div>
+</div>
+<p>Primitive types can be converted back to standard Python objects to perform unsafe
+operations as well by using the <code class="docutils literal notranslate"><span class="pre">.value</span></code> attribute of the token. In general,
+this is not encouraged. All type conversions should be done using the KTypes type-casting
+system (underdevelopment)</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="mi">3</span> <span class="o">+</span> <span class="n">x</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+<span class="c1"># 3</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="c1"># 12 : int</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
+<p>In addition to type annotations for data, KTypes also supports type annotations for
+functions defined between formally typed data. Using the <code class="docutils literal notranslate"><span class="pre">types.function</span></code> decorator,
+we can mark standard Python methods as formally typed functions and use these functions
+in formally typed settings.</p>
+<p>In order for the function decorator to behave properly, decorated functions must
+be fully type specified using the annotation syntax introduced in Python 3</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@types</span><span class="o">.</span><span class="n">function</span>
+<span class="k">def</span> <span class="nf">twice</span><span class="p">(</span><span class="n">x</span> <span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">x</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">twice</span><span class="p">)</span>
+<span class="n">twice</span> <span class="p">:</span> <span class="nb">int</span> <span class="o">-&gt;</span> <span class="nb">int</span>
+</pre></div>
+</div>
+<p>In the example above, we decorate the fully-annotated method <code class="docutils literal notranslate"><span class="pre">twice</span></code> to convert
+it into a formally typed function. The syntax for notating formal function types
+is borrowed from Haskell, as evidenced by the <code class="docutils literal notranslate"><span class="pre">__str__</span></code> method defined for the decorated
+<code class="docutils literal notranslate"><span class="pre">twice</span></code> formal function object. As this notation implies, multiple argument formal
+function are in fact curried functions. Formal functions can be evaluated with either the
+traditional syntax, or with the more ‘correct’ curried notation</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@types</span><span class="o">.</span><span class="n">function</span>
+<span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="n">x</span> <span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">,</span> <span class="n">y</span> <span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span>
+<span class="c1"># sum : int -&gt; int -&gt; int</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+<span class="c1"># 30 : int</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)(</span><span class="n">y</span><span class="p">))</span>
+<span class="c1"># 30 : int</span>
+</pre></div>
+</div>
+<p>As expected, partial currying of an argument returns a partially evaluated function
+which can is still a formal function, and which can be used later. Borrowing the <code class="docutils literal notranslate"><span class="pre">sum</span></code>
+function from above:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">add5</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">add5</span><span class="p">)</span>
+<span class="c1"># klambda&lt;sum&gt; : int -&gt; int</span>
+
+<span class="n">y</span> <span class="o">=</span> <span class="n">add5</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="mi">15</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="c1"># 20 : int</span>
+</pre></div>
+</div>
+<p>While there is no requirement that only formal function are used during data
+manipulations, best practice would have it that one <em>ought always</em> use formal functions
+to manipulate data. The strength of a formal type system is in the transparency
+and confidence it provides when manipulating data. These benefits would be lost if
+standard Python methods were used instead.</p>
+</div>
+</div>
+<div class="section" id="constructions">
+<h2>Constructions<a class="headerlink" href="#constructions" title="Permalink to this headline">¶</a></h2>
+<p>Beyond the primitive types and formal function types, the KTypes library also
+supports the type-theoretic construction of product and coproduct types, or, equivalently,
+“and” and “or” types, respectively. These methods of constructing new types gives the
+KTypes ecosystem the additional level or expressivity and richness required to represent
+most data schemas.</p>
+<div class="section" id="product-types">
+<h3>Product Types<a class="headerlink" href="#product-types" title="Permalink to this headline">¶</a></h3>
+<p>The first construction is the (Cartesian) Product. Whereas Formal Type Theory defines
+this procedure to be a binary operation on two component types, due to the prevalence
+of product types in real world applications, the KTypes library treats all product types
+as n-products, thus avoiding the unnecessary syntax required to iteratively apply a
+binary product type constructor.</p>
+<p>Constructing a product type is remarkably simple. A <code class="docutils literal notranslate"><span class="pre">dict</span></code> is used to encode all
+information required to express the n-product, and passing the dict into the <code class="docutils literal notranslate"><span class="pre">types</span></code>
+module is sufficient for the library to complete the type inference and construct the
+appropriate type.</p>
+<p>Because two components of an n-product can be the same type, a unique identifier would be
+required to distinguish between them. Solving for this problem, all n-products are defined
+with named components. A <code class="docutils literal notranslate"><span class="pre">dict</span></code> handles this association perfectly.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">schema</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">str</span><span class="p">,</span>
+    <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The above <code class="docutils literal notranslate"><span class="pre">schema</span></code> defines the information necessary to infer a 2-product type
+containing both <code class="docutils literal notranslate"><span class="pre">str</span></code> and <code class="docutils literal notranslate"><span class="pre">int</span></code> types. To the object oriented programmer, this
+type of construction should bear a striking resemblance to defining a <code class="docutils literal notranslate"><span class="pre">class</span></code>. The
+keys in the <code class="docutils literal notranslate"><span class="pre">dict</span></code> correspond to the attribute names and the values correspond to the
+formal type of each attribute.</p>
+<p>Given such a <code class="docutils literal notranslate"><span class="pre">dict</span></code> such as <code class="docutils literal notranslate"><span class="pre">schema</span></code> from above, constructing a product type is easy:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">types</span><span class="o">.</span><span class="n">person</span> <span class="o">=</span> <span class="n">schema</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">person</span><span class="p">)</span>
+<span class="c1"># person</span>
+</pre></div>
+</div>
+<p>This syntax has two key requirements which are not immediately obvious.</p>
+<ol class="arabic simple">
+<li>The attribute name of <code class="docutils literal notranslate"><span class="pre">types</span></code> which we are assigning to name the new product type,
+in this case, <code class="docutils literal notranslate"><span class="pre">person</span></code>, must not already be associated with a type. In other words, redefining
+named types is not a supported action, but defining a new type is.</li>
+<li>A <code class="docutils literal notranslate"><span class="pre">dict</span></code> must be supplied on the right hand side, and it must be well-formed.
+That is, it must have attribute names as keys and known types as values. Note that
+the known type values need not be primitive types.</li>
+</ol>
+<p>Note also that the order provided in the <code class="docutils literal notranslate"><span class="pre">dict</span></code> is relevant to the definition of
+the n-product type, a different order will product a different n-product type.</p>
+<p>A token of an n-product type can be constructed by supplying a <code class="docutils literal notranslate"><span class="pre">dict</span></code> very similar
+to the <code class="docutils literal notranslate"><span class="pre">schema</span></code> which was used to construct the n-product type, but replacing the
+values of the dict with actual tokens of the required type. Once a new type is defined,
+it can be accessed by attributing the <cite>types</cite> module. N-product types are constructed
+by the same syntax which constructs instances of standard Python objects. Note that
+the instance data supplied must be the appropriate <code class="docutils literal notranslate"><span class="pre">dict</span></code> or a type mismatch error
+will be thrown.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">str</span><span class="p">(</span><span class="s2">&quot;Charles&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="s2">&quot;21&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">person_token</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">person</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">person_token</span><span class="p">)</span>
+<span class="c1"># [Charles : str, 21 : int] : person</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="coproduct-types">
+<h3>Coproduct Types<a class="headerlink" href="#coproduct-types" title="Permalink to this headline">¶</a></h3>
+<p>Coproduct types serve the same role as unions in C/C++ and Haskell. Following the
+logic of left/right injections which, in a formal Type-Theoretic setting, construct
+tokens of the coproduct type, the coproduct constructor is a binary operation on
+two known types. Currently the coproduct constructor is non-commutative, and thus
+the coproduct types <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">|</span> <span class="pre">B</span></code> and <code class="docutils literal notranslate"><span class="pre">B</span> <span class="pre">|</span> <span class="pre">A</span></code> are distinct.</p>
+<p>Coproduct types can also be understood as “or” types, hence the bar “or-operator”
+used in the syntax of the coproduct constructor. As a result, constructing a coproduct
+type is quite intuitive:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">types</span><span class="o">.</span><span class="n">person_or_errormsg</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">person</span> <span class="o">|</span> <span class="n">types</span><span class="o">.</span><span class="n">str</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">person_or_errormsg</span><span class="p">)</span>
+<span class="c1"># person | str</span>
+</pre></div>
+</div>
+<p>A token of a coproduct type can be constructed by passing in one of the allowable types
+of the coproduct into the constructor. Building on the previous examples:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">coprod_token1</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">person_or_errormsg</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">str</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">))</span>
+<span class="n">coprod_token2</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">person_or_errormsg</span><span class="p">(</span><span class="n">person_token</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">coprod_token1</span><span class="p">)</span>
+<span class="c1"># inr(error : str) : person | str</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">coprod_token2</span><span class="p">)</span>
+<span class="c1"># inl([Charles : str, 21 : int] : person) : person | str</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="product-functions">
+<h3>Product Functions<a class="headerlink" href="#product-functions" title="Permalink to this headline">¶</a></h3>
+<p>Beyond grouping relevant data together, product types are also useful as they permit
+formally typed functions to be defined over them. Functions defined over product
+types can be single-domain typed to avoid any unnecessary complications with currying
+and multiple arguments.</p>
+<p>The KTypes library includes a built-in product function constructor which takes in a
+curried formal function and outputs a single-domain typed formal function defined
+over the product type inferred from the input function’s signature.</p>
+<p>As an example, give some function <code class="docutils literal notranslate"><span class="pre">f</span> <span class="pre">:</span> <span class="pre">int</span> <span class="pre">-&gt;</span> <span class="pre">int</span> <span class="pre">-&gt;</span> <span class="pre">int</span></code>, supplying <code class="docutils literal notranslate"><span class="pre">f</span></code> as the
+input to the KTypes product function constructor would yield a single-domain typed
+formal function defined on the product type <code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">%</span> <span class="pre">int</span></code>. In other words, we would
+obtain <code class="docutils literal notranslate"><span class="pre">f'</span> <span class="pre">:</span> <span class="pre">int</span> <span class="pre">&amp;</span> <span class="pre">int</span> <span class="pre">-&gt;</span> <span class="pre">int</span></code> which only takes one argument, a token of the product
+type <code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">&amp;</span> <span class="pre">int</span></code>.</p>
+<p>The product function construct can be called from the <code class="docutils literal notranslate"><span class="pre">types</span></code> module as demonstrated
+below:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># define the product type</span>
+<span class="n">types</span><span class="o">.</span><span class="n">int_pair</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">,</span>
+    <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="nd">@types</span><span class="o">.</span><span class="n">function</span>
+<span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="n">x</span> <span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">,</span> <span class="n">y</span> <span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+
+<span class="n">prod_sum</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">ind_prod</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">sum</span><span class="p">)</span>
+<span class="c1"># sum : int -&gt; int -&gt; int</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">prod_sum</span><span class="p">)</span>
+<span class="c1"># klambda : int_pair -&gt; int</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="coproduct-functions">
+<h3>Coproduct Functions<a class="headerlink" href="#coproduct-functions" title="Permalink to this headline">¶</a></h3>
+<p>Similarly, the KTypes library gives the power to define functions out of coproduct
+types. The syntax is aliased to the pipe (<code class="docutils literal notranslate"><span class="pre">|</span></code>) operator, and provides a modular
+approach that allows reduces <code class="docutils literal notranslate"><span class="pre">if/else</span></code> clutter when defining such functions.</p>
+<p>Given a coproduct type <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">|</span> <span class="pre">B</span></code> and two functions <code class="docutils literal notranslate"><span class="pre">f</span> <span class="pre">:</span> <span class="pre">A</span> <span class="pre">-&gt;</span> <span class="pre">C</span></code> and <code class="docutils literal notranslate"><span class="pre">g</span> <span class="pre">:</span> <span class="pre">B</span> <span class="pre">-&gt;</span> <span class="pre">C</span></code>
+the KTypes library interprets the well-defined expression <code class="docutils literal notranslate"><span class="pre">f</span> <span class="pre">|</span> <span class="pre">g</span></code> as defining
+a new function out of the coproduct type <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">|</span> <span class="pre">B</span></code> whose operation is uniquely defined
+by evaluating either <code class="docutils literal notranslate"><span class="pre">f</span></code> or <code class="docutils literal notranslate"><span class="pre">g</span></code>. In other words, <code class="docutils literal notranslate"><span class="pre">f</span> <span class="pre">|</span> <span class="pre">g</span></code> is a formally typed
+function and we express it as <code class="docutils literal notranslate"><span class="pre">f</span> <span class="pre">|</span> <span class="pre">g</span> <span class="pre">:</span> <span class="pre">A</span> <span class="pre">|</span> <span class="pre">B</span> <span class="pre">-&gt;</span> <span class="pre">C</span></code>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>While Formal Type Theory does not distinguish between simple types, their closure
+under products/coproducts, and formal function types, the KTypes library does not currently
+permit the inclusion of formal functions in products/coproducts. Effectively, the
+library enforces a strict differentiation between data and data manipulations.</p>
+<p class="last">Thus, there should be no ambiguity when the pipe operator is used. When <code class="docutils literal notranslate"><span class="pre">A</span></code> is a
+simple type and <code class="docutils literal notranslate"><span class="pre">f</span></code> is a formal function, the operation <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">|</span> <span class="pre">f</span></code> is not well
+defined an will throw an exception.</p>
+</div>
+<p>In defining formal functions out of coproduct types in this way, there are three
+requirements to ensure the well-formed-ness of the expression <code class="docutils literal notranslate"><span class="pre">f</span> <span class="pre">|</span> <span class="pre">g</span></code>.</p>
+<ol class="arabic simple">
+<li>Both functions <code class="docutils literal notranslate"><span class="pre">f</span></code> and <code class="docutils literal notranslate"><span class="pre">g</span></code> must land in the same type.</li>
+<li>Both functions <code class="docutils literal notranslate"><span class="pre">f</span></code> and <code class="docutils literal notranslate"><span class="pre">g</span></code> must not be defined over the same domain.</li>
+<li>Both functions <code class="docutils literal notranslate"><span class="pre">f</span></code> and <code class="docutils literal notranslate"><span class="pre">g</span></code> must be single-domain typed functions. They may
+not curry arguments.</li>
+</ol>
+<p>Of course it is assumed that both <code class="docutils literal notranslate"><span class="pre">f</span></code> and <code class="docutils literal notranslate"><span class="pre">g</span></code> are formal functions notated by the
+<code class="docutils literal notranslate"><span class="pre">types.function</span></code> decorator. The follow example shows this construction in practice:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">types</span><span class="o">.</span><span class="n">int_or_str</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span> <span class="o">|</span> <span class="n">types</span><span class="o">.</span><span class="n">str</span>
+
+<span class="nd">@types</span><span class="o">.</span><span class="n">function</span>
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span> <span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">types</span><span class="o">.</span><span class="n">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">types</span><span class="o">.</span><span class="n">str</span><span class="p">(</span><span class="s2">&quot;It is an integer&quot;</span><span class="p">)</span>
+
+<span class="nd">@types</span><span class="o">.</span><span class="n">function</span>
+<span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="n">x</span> <span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">types</span><span class="o">.</span><span class="n">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">types</span><span class="o">.</span><span class="n">str</span><span class="p">(</span><span class="s2">&quot;String is &#39;&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">x</span> <span class="o">+</span> <span class="n">types</span><span class="o">.</span><span class="n">str</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
+
+<span class="n">to_str</span> <span class="o">=</span> <span class="n">f</span> <span class="o">|</span> <span class="n">g</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">to_str</span><span class="p">)</span>
+<span class="c1"># klambda : int | str -&gt; str</span>
+
+<span class="n">token</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">int_or_str</span><span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">to_str</span><span class="p">(</span><span class="n">token</span><span class="p">))</span>
+<span class="c1"># It was a string &#39;hello&#39; : str</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="predicates">
+<h2>Predicates<a class="headerlink" href="#predicates" title="Permalink to this headline">¶</a></h2>
+<p>The KTypes library also provides functionality to define <strong>subtypes</strong> out of pre-existing
+types within the type universe. Subtypes are built from existing types but enforce a
+custom defined boolean predicate which is checked at runtime to ensure type-correctness.</p>
+<p>Predicates can be user defined functions or lambda expressions, which take in as their
+sole argument the piece or raw data which should be evaluated, and returns true or false
+depending on if the raw data matches. Predicated types are created as follows using the
+<code class="docutils literal notranslate"><span class="pre">.where(...)</span></code> attribute method.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">is_na</span><span class="p">(</span><span class="n">raw_data</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">raw_data</span> <span class="o">==</span> <span class="s2">&quot;N/A&quot;</span>
+
+<span class="n">types</span><span class="o">.</span><span class="n">nan</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">predicate</span><span class="o">=</span><span class="n">is_na</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">nan</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">))</span>
+<span class="c1"># False</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">nan</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="s2">&quot;N/A&quot;</span><span class="p">))</span>
+<span class="c1"># True</span>
+</pre></div>
+</div>
+<p>In the example above, we see that <code class="docutils literal notranslate"><span class="pre">types.nan</span></code> is a user-defined subtype of the
+primitive type <code class="docutils literal notranslate"><span class="pre">str</span></code> where the only token of the type is <code class="docutils literal notranslate"><span class="pre">&quot;N/A&quot;</span></code>. Because
+predicates are simple Python methods, the provide additional power and usability
+to the KTypes framework. More complex predicates can enforce regex matching, gate
+ranges and specific values, or even be used to model enums.</p>
+</div>
+<div class="section" id="parsing">
+<h2>Parsing<a class="headerlink" href="#parsing" title="Permalink to this headline">¶</a></h2>
+<p>The primary goal of the KTypes library is to facilitate the ingesting and processing
+of ad-hoc data formats. These are sources of data which result from possibly real-world
+sources which may be incomplete, corrupt, or unstandardized. Our goals is to bring these
+ad-hoc data formats into a well typed environment where reasoning and manipulations can
+be made precise.</p>
+<p>As a result, the KTypes framework takes inspiration and follows much of the design
+as the <a class="reference external" href="https://dl.acm.org/doi/10.1145/1938551.1938556">PADS project</a>. Specifically,
+we introduce a built-in parser to assist in the automated ingestion of ad-hoc data
+formats. Data can be directly parsed into a type using an instance of the the
+<cite>types.parser</cite> class, which takes in a known type and a parse format specification
+string.</p>
+<p>A parse format specification string is a Python <cite>str</cite> which describes how a known
+type should be translated into a string raw data representation. Currently, the parser
+is only compatible with product types built from primitive/or types, but this is an active
+domain for development.</p>
+<p>Each attribute of the product type should be enclosed in <code class="docutils literal notranslate"><span class="pre">$</span></code> (dollar signs), and
+any non-enclosed characters are treated as delimiters which complete the data
+representation. The following example demonstrates a typical <code class="docutils literal notranslate"><span class="pre">.csv</span></code> format for the
+<code class="docutils literal notranslate"><span class="pre">user</span></code> product type.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">types</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">str</span><span class="p">,</span>
+    <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span><span class="p">,</span>
+    <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">str</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">parse_format</span> <span class="o">=</span> <span class="s2">&quot;$name$, $age$, $email$</span><span class="se">\n</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p>Given the <code class="docutils literal notranslate"><span class="pre">user</span></code> type and the <code class="docutils literal notranslate"><span class="pre">parse_format</span></code> as above, constructing a KTypes
+parser is simple:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">parser</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">parser</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">parse_format</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The type specification and parse format specification are abstracted into separate
+entities to allow various data formats all to be parsed into the same underlying type,
+which reduces the need to modify downstream code. Thus, changes to the data source
+can in general be handled by updating the parse format, reducing the risk of propagating
+changes to downstream code and logic.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">parser</span></code> can then be used to parse raw string data into well-formed known types.
+Specifically, <code class="docutils literal notranslate"><span class="pre">parser</span></code> will create tokens of the <code class="docutils literal notranslate"><span class="pre">user</span></code> type.</p>
+<p>A parser has two methods of parsing raw string data: <strong>instance</strong> and <strong>stream</strong></p>
+<div class="section" id="instance">
+<h3>Instance<a class="headerlink" href="#instance" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">.parse_instance(...)</span></code> method takes in a Python <code class="docutils literal notranslate"><span class="pre">str</span></code> object and greedily
+parses out a single token. The following example illustrates how it works. Given the
+<code class="docutils literal notranslate"><span class="pre">parser</span></code> as defined above:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">raw_data</span> <span class="o">=</span> <span class="s2">&quot;John Howerson, 42, howerson@email.org</span><span class="se">\n</span><span class="s2"> ignored content&quot;</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_instance</span><span class="p">(</span><span class="n">raw_data</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<span class="c1"># [John Howerson : str, 42 : int, howerson@email.org : str] : user</span>
+</pre></div>
+</div>
+<p>The output of <code class="docutils literal notranslate"><span class="pre">.parse_instance(...)</span></code>, if the parsing succeeds, is a well-formed
+token of the type supplied when the <code class="docutils literal notranslate"><span class="pre">parser</span></code> was defined. This can then be used
+as an input to any formal function and all KTypes manipulations are supported.</p>
+<p>Notice that <code class="docutils literal notranslate"><span class="pre">raw_data</span></code> must not totally match the type, and greedy parsing ensures
+that the longest-first matching substring of <code class="docutils literal notranslate"><span class="pre">raw_data</span></code> is used. Longest-first is
+the longest substring after the first match, where all in-between substrings are
+also matches.</p>
+<p>In other words, the parse will keep consuming characters until a match is encountered.
+If the next (lookahead) character causes a match failure, then this substring will
+be used as the raw data instance; otherwise, the parser will continue consuming
+characters and building up the raw data instance until the lookahead token induces
+a match failure.</p>
+</div>
+<div class="section" id="stream">
+<h3>Stream<a class="headerlink" href="#stream" title="Permalink to this headline">¶</a></h3>
+<p>The KTypes parser is also available as a stream parser. Using the <code class="docutils literal notranslate"><span class="pre">.parse_stream(...)</span></code>
+method, the parser will ingest the supplied raw string data instance and store all parsed
+tokens as a list. This is a persistent list, so long as the <code class="docutils literal notranslate"><span class="pre">reset</span></code> argument is not
+set to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">.parse_stream(...)</span></code> method returns a window to this persistent list after each
+call, thus all tokens can be obtained by saving the final return value of the method.</p>
+<p>The following example demonstrates these two features.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">raw_data1</span> <span class="o">=</span> <span class="s2">&quot;John Howerson, 42, howerson@email.org</span><span class="se">\n</span><span class="s2">Bob Billins, 23, bill@mail.com</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_stream</span><span class="p">(</span><span class="n">raw_data</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="c1"># [John Howerson : str, 42 : int, howerson@email.org : str] : user</span>
+<span class="c1"># [Bob Billins : str, 23 : int, bill@mail.com : str] : user</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_stream</span><span class="p">(</span><span class="s2">&quot;James Ray&quot;</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_stream</span><span class="p">(</span><span class="s2">&quot;, 31&quot;</span><span class="p">,</span> <span class="s2">&quot;)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_stream</span><span class="p">(</span><span class="s2">&quot;ray.j@mailmain.edu</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+<span class="c1"># [John Howerson : str, 42 : int, howerson@email.org : str] : user</span>
+<span class="c1"># [Bob Billins : str, 23 : int, bill@mail.com : str] : user</span>
+<span class="c1"># [James Raw : str, 31 : int, ray.j@mailmain.edu : str] : user</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2021, Kevin Tang.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="_sources/concepts.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
