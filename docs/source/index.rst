@@ -1,6 +1,6 @@
 .. KTypes documentation master file.
 
-KnownTypes Documentation
+KnownTypes
 ========================
 
 KnownTypes or KTypes is a an Python open-source library which provides a framework to 
